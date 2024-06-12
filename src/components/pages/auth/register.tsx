@@ -169,7 +169,7 @@ export const RegisterPage: React.FC<RegisterProps> = ({
                           required: true,
                           message: translate(
                               "pages.register.errors.requiredEmail",
-                              "Email is required"
+                              "Email field is required"
                           ),
                       },
                       {
@@ -195,7 +195,7 @@ export const RegisterPage: React.FC<RegisterProps> = ({
                           required: true,
                           message: translate(
                               "pages.register.errors.requiredFirstName",
-                              "Firstname is required"
+                              "First Name field is required"
                           ),
                       },
                   ]}
@@ -214,7 +214,7 @@ export const RegisterPage: React.FC<RegisterProps> = ({
                           required: true,
                           message: translate(
                               "pages.register.errors.requiredLastName",
-                              "Lastname is required"
+                              "Last Name field is required"
                           ),
                       },
                   ]}
@@ -229,18 +229,23 @@ export const RegisterPage: React.FC<RegisterProps> = ({
                   name="password"
                   label={translate("pages.register.fields.password", "Password")}
                   rules={[
-                      {required: true, message: 'Your password cannot be empty.'},
-                      {min: 12, message: 'Your password length must be at least 12 characters.'},
-                      {max: 128, message: 'Your password length must not exceed 128 characters.'},
-                      {pattern: /[A-Z]+/, message: 'Your password must contain at least one uppercase letter.'},
-                      {pattern: /[a-z]+/, message: 'Your password must contain at least one lowercase letter.'},
-                      {pattern: /[0-9]+/, message: 'Your password must contain at least one number.'},
-                      {pattern: /[!?*.]+/, message: 'Your password must contain at least one (!? *.).'},
+                      {required: true, message: 'Password field is required'},
+                      {min: 12, message: 'Your password length must be at least 12 characters'},
+                      {max: 128, message: 'Your password length must not exceed 128 characters'},
+                      {pattern: /[A-Z]+/, message: 'Your password must contain at least one uppercase letter'},
+                      {pattern: /[a-z]+/, message: 'Your password must contain at least one lowercase letter'},
+                      {pattern: /[0-9]+/, message: 'Your password must contain at least one number'},
+                      {pattern: /[!?*.]+/, message: 'Your password must contain at least one (!? *.)'},
                       {
                           validator: (_, value) => {
-                              const uniqueChars = new Set(value).size;
-                              if (value && uniqueChars < 6) return Promise.reject(
-                                      'Your password needs to contain at least 6 unique characters.');
+                              if (value) {
+                                  const charCountMap: Record<string, number> = {};
+                                  for (const char of value) {
+                                      if ((charCountMap[char] = (charCountMap[char] || 0) + 1) > 6) {
+                                          return Promise.reject('Your password should contain at most 6 duplicate characters');
+                                      }
+                                  }
+                              }
                               return Promise.resolve();
                           }
                       },
@@ -268,14 +273,17 @@ export const RegisterPage: React.FC<RegisterProps> = ({
                   rules={[
                       {
                           required: true,
-                          message: 'Please confirm your password!',
+                          message: translate(
+                      "pages.register.errors.requiredConfirmPassword",
+                      "Confirm Password field is required"
+                      ),
                       },
                       ({getFieldValue}) => ({
                           validator(_, value) {
                               if (!value || getFieldValue('password') === value) {
                                   return Promise.resolve();
                               }
-                              return Promise.reject('The new password that you entered do not match!');
+                              return Promise.reject('The new password that you entered do not match');
                           },
                       }),
                   ]}
@@ -295,7 +303,7 @@ export const RegisterPage: React.FC<RegisterProps> = ({
                           validator: (_, value) =>
                               value ? Promise.resolve() :
                                   Promise.reject(new Error(
-                                      'You must accept the terms of service before continuing.'
+                                      'You must accept the terms of service before continuing'
                                   )),
                       },
                   ]}
